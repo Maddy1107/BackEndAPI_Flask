@@ -3,7 +3,7 @@ import uuid
 from flask import request, send_file, jsonify
 import yt_dlp
 
-DOWNLOAD_DIR = "/downloads"
+DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 FFMPEG_PATH = r'C:/ffmpeg/bin'
 
