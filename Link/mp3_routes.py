@@ -1,9 +1,6 @@
 import os
-import subprocess
-import traceback
 import uuid
 from flask import request, send_file, jsonify
-from pytube import YouTube
 import yt_dlp
 
 DOWNLOAD_DIR = "/downloads"
