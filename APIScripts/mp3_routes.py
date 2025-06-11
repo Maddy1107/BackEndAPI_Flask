@@ -32,7 +32,7 @@ def register_mp3_routes(app):
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'ffmpeg_location': FFMPEG_PATH,
+                #'ffmpeg_location': FFMPEG_PATH,
                 'quiet': True,
             }
 
