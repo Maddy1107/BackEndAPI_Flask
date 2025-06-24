@@ -15,7 +15,7 @@ A collection of modular Flask-based APIs built to handle various backend tasks i
 ### 🔊 MP3 API
 
 - Provide download links or stream MP3 files
-- Serve MP3 metadata (e.g., title, artist, duration)
+- Fetch MP3 title
 
 ---
 
