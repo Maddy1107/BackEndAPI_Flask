@@ -4,24 +4,26 @@ from io import BytesIO
 from openpyxl import load_workbook
 import pandas as pd
 
+
 def extract_product_quantity(file_path):
     try:
         df = pd.read_excel(file_path, header=None, skiprows=4)
         if len(df.columns) < 4:
-            return {}, 'Excel file does not have enough columns'
+            return {}, "Excel file does not have enough columns"
         product_col, quantity_col = df.columns[2], df.columns[3]
 
-        df[quantity_col] = df[quantity_col].fillna('')
+        df[quantity_col] = df[quantity_col].fillna("")
 
         filtered_df = df[[product_col, quantity_col]]
         data_dict = {
             str(row[product_col]): row[quantity_col]
             for _, row in filtered_df.iterrows()
-            if pd.notnull(row[product_col]) and str(row[product_col]).strip() != ''
+            if pd.notnull(row[product_col]) and str(row[product_col]).strip() != ""
         }
         return data_dict, None
     except Exception as e:
         return {}, str(e)
+
 
 def update_excel_file(file, update_dict):
     try:
@@ -35,7 +37,8 @@ def update_excel_file(file, update_dict):
             if product_name in update_dict:
                 quantity_cell.value = update_dict[product_name]
 
-        sheet['E3'] = datetime.datetime.now().strftime('%d-%m-%Y')
+        sheet["E3"] = datetime.datetime.now().strftime("%d-%m-%Y")
+        sheet["E1"] = "Priyanka Roy"
 
         output_stream = BytesIO()
         wb.save(output_stream)
