@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from db_operations import insert_month_data, get_month_data
+from db_operations import insert_monthly_product_data, get_product_data_by_month
 
 
 def register_product_routes(app):
@@ -17,12 +17,12 @@ def register_product_routes(app):
             )
 
         try:
-            insert_month_data(month, data)
+            insert_monthly_product_data(month, data)
             return jsonify({"message": "Data inserted", "count": len(data)})
         except Exception as e:
             return jsonify({"error": "Failed to insert data", "message": str(e)}), 500
 
     @app.route("/month-data/<month>", methods=["GET"])
     def fetch_month_data(month):
-        data = get_month_data(month)
+        data = get_product_data_by_month(month)
         return jsonify({"month": month, "products": data})
