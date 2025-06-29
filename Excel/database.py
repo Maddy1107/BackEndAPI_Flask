@@ -5,11 +5,7 @@ db = SQLAlchemy()
 
 
 def init_db(app):
-    raw_uri = os.getenv("DATABASE_URL", "")
-    if not raw_uri:
-        raise Exception("DATABASE_URL not set in .env or environment")
-
-    uri = raw_uri.replace("postgres://", "postgresql://", 1)
+    uri = "postgresql://neondb_owner:npg_16dtTzOgnhfU@ep-broad-shape-a897iy1b-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 
     app.config["SQLALCHEMY_DATABASE_URI"] = uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
