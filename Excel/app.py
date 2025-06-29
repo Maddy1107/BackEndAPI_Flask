@@ -1,5 +1,10 @@
 from flask import Flask
 from database import init_db
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from db_routes import register_product_routes
 from excel_routes import register_excel_routes
 
