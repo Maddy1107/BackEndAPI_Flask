@@ -39,8 +39,15 @@ def update_excel_file(file, update_dict, sheet_name=None):
 
             product_name = str(product_cell.value).strip() if product_cell.value else ""
             if product_name in update_dict:
-                target_cell.value[0] = update_dict[product_name]
-                remarks_cell.value[1] = update_dict[product_name]
+                values = update_dict[product_name]
+                if isinstance(values, list) and len(values) >= 2:
+                    target_cell.value = values[0]
+                    remarks_cell.value = values[1]
+                else:
+                    return (
+                        None,
+                        f"Invalid format for '{product_name}'. Expected a list of at least 2 values.",
+                    )
 
         update_named_cells()
 
