@@ -5,9 +5,9 @@ from database import db
 def insert_monthly_product_data(month, product_dict):
     db.session.query(MonthlyProductData).filter_by(month=month).delete()
 
-    for product_name, quantity in product_dict.items():
+    for product_name, quantity, bottles in product_dict.items():
         entry = MonthlyProductData(
-            month=month, product_name=product_name, quantity=quantity
+            month=month, product_name=product_name, quantity=quantity, bottles=bottles
         )
         db.session.add(entry)
     db.session.commit()
@@ -17,5 +17,10 @@ def insert_monthly_product_data(month, product_dict):
 def get_product_data_by_month(month):
     entries = MonthlyProductData.query.filter_by(month=month).all()
     return [
-        {"product": entry.product_name, "quantity": entry.quantity} for entry in entries
+        {
+            "product": entry.product_name,
+            "quantity": entry.quantity,
+            "bottles": entry.bottles,
+        }
+        for entry in entries
     ]

@@ -25,20 +25,24 @@ def extract_product_quantity(file_path):
         return {}, str(e)
 
 
-def update_excel_file(file, update_dict):
+def update_excel_file(file, update_dict, sheet_name=None):
     try:
         wb = load_workbook(file)
-        sheet = wb.active
+        sheet = wb[sheet_name] if sheet_name else wb.active
+
+        month_col_index = get_month_column(sheet)
 
         for row in sheet.iter_rows(min_row=5):
-            product_cell = row[2]  # Column C
-            quantity_cell = row[3]  # Column D
+            product_cell = row[2]
+            target_cell = row[3] if month_col_index == -1 else row[month_col_index]
+            remarks_cell = row[4] if month_col_index == -1 else row[month_col_index + 1]
+
             product_name = str(product_cell.value).strip() if product_cell.value else ""
             if product_name in update_dict:
-                quantity_cell.value = update_dict[product_name]
+                target_cell.value[0] = update_dict[product_name]
+                remarks_cell.value[1] = update_dict[product_name]
 
-        sheet["E3"] = datetime.datetime.now().strftime("%d-%m-%Y")
-        sheet["E1"] = "Priyanka Roy"
+        update_named_cells()
 
         output_stream = BytesIO()
         wb.save(output_stream)
@@ -47,3 +51,32 @@ def update_excel_file(file, update_dict):
         return output_stream, None
     except Exception as e:
         return None, str(e)
+
+
+def get_month_column(sheet):
+    current_month = datetime.datetime.now().strftime("%B").lower()  # "june"
+    header_row = sheet[4]
+
+    for col_index, cell in enumerate(header_row):
+        cell_value = str(cell.value).strip().lower() if cell.value else ""
+        if current_month in cell_value:
+            return col_index  # 0-based index
+
+    return -1  # Not found
+
+
+def update_named_cells(sheet):
+    for row in sheet.iter_rows():
+        for i, cell in enumerate(row):
+            if not cell.value:
+                continue
+
+            cell_value = str(cell.value).strip().lower()
+
+            # Match "Name"
+            if "name" in cell_value:
+                row[i + 1].value = "Priyanka Roy"
+
+            # Match "Handover Date:"
+            elif "handover" in cell_value:
+                row[i + 1].value = datetime.datetime.now().strftime("%d-%m-%Y")
