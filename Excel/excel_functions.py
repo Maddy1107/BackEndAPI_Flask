@@ -49,7 +49,7 @@ def update_excel_file(file, update_dict, sheet_name=None):
                         f"Invalid format for '{product_name}'. Expected a list of at least 2 values.",
                     )
 
-        update_named_cells(sheet_name)
+        update_named_cells(sheet)
 
         output_stream = BytesIO()
         wb.save(output_stream)
