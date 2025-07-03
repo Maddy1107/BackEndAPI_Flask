@@ -1,6 +1,5 @@
 from flask import Flask
 from database import init_db
-from models import MonthlyProductData
 
 from db_routes import register_product_routes
 from excel_routes import register_excel_routes
