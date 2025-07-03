@@ -1,21 +1,18 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from database import init_db
 
-db = SQLAlchemy()
-migrate = Migrate()
+from dotenv import load_dotenv
 
+load_dotenv()
 
-def create_app():
-    app = Flask(__name__)
+from db_routes import register_product_routes
+from excel_routes import register_excel_routes
 
-    # your actual DB URI
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL", "sqlite:///app.db"
-    )
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app = Flask(__name__)
+init_db(app)
 
-    db.init_app(app)
-    migrate.init_app(app, db)  # 🚀 Init Flask-Migrate here
+register_excel_routes(app)
+register_product_routes(app)
 
-    return app
+if __name__ == "__main__":
+    app.run(debug=True)
