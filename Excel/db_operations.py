@@ -43,7 +43,6 @@ def get_product_data_by_month(month, year):
             "product": entry.product_name,
             "quantity": entry.quantity,
             "bottles": entry.bottles,
-            "year": entry.year,
         }
         for entry in entries
     ]
