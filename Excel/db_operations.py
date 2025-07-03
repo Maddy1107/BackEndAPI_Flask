@@ -2,7 +2,7 @@ from models import MonthlyProductData
 from database import db
 
 
-def insert_monthly_product_data(month, product_dict):
+def insert_monthly_product_data(month, year, product_dict):
     try:
         for product_name, values in product_dict.items():
             if not isinstance(values, list) or len(values) < 2:
@@ -16,6 +16,7 @@ def insert_monthly_product_data(month, product_dict):
                 product_name=product_name,
                 quantity=quantity,
                 bottles=bottles,
+                year=year,
             )
             db.session.add(entry)
 
@@ -35,13 +36,14 @@ def insert_monthly_product_data(month, product_dict):
         return {"error": "Failed to insert data", "message": str(e)}
 
 
-def get_product_data_by_month(month):
-    entries = MonthlyProductData.query.filter_by(month=month).all()
+def get_product_data_by_month(month, year):
+    entries = MonthlyProductData.query.filter_by(month=month, year=year).all()
     return [
         {
             "product": entry.product_name,
             "quantity": entry.quantity,
             "bottles": entry.bottles,
+            "year": entry.year,
         }
         for entry in entries
     ]
