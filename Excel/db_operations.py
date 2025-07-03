@@ -4,8 +4,6 @@ from database import db
 
 def insert_monthly_product_data(month, product_dict):
     try:
-        db.session.query(MonthlyProductData).filter_by(month=month).delete()
-
         for product_name, values in product_dict.items():
             if not isinstance(values, list) or len(values) < 2:
                 continue  # or raise an error
