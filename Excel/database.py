@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
-import os
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 def init_db(app):
@@ -9,7 +10,6 @@ def init_db(app):
 
     app.config["SQLALCHEMY_DATABASE_URI"] = uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db.init_app(app)
 
-    with app.app_context():
-        db.create_all()
+    db.init_app(app)
+    migrate.init_app(app, db)  # ✅ Now you're using Flask-Migrate
