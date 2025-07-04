@@ -15,7 +15,9 @@ def init_db(app):
     if not uri:
         raise ValueError("Missing SUPABASE_DB_URI in environment variables")
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = uri
+    import os
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SUPABASE_DB_URI")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
