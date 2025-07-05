@@ -1,15 +1,27 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+import os
+
+# Load variables from .env
+load_dotenv()
 
 db = SQLAlchemy()
 migrate = Migrate()
 
 
 def init_db(app):
-    uri = "postgresql://neondb_owner:npg_16dtTzOgnhfU@ep-broad-shape-a897iy1b-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
+    env = os.getenv("APP_ENV", "development").lower()
+    db_uri = os.getenv("NEON_DB_URI")
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = uri
+    if not db_uri:
+        raise RuntimeError("❌ Environment variable NEON_DB_URI is not set.")
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["DEBUG"] = env != "production"
 
     db.init_app(app)
-    migrate.init_app(app, db)  # ✅ Now you're using Flask-Migrate
+    migrate.init_app(app, db)
+
+    print(f"✅ DB connected [{env}]")
