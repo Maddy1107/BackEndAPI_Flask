@@ -12,7 +12,10 @@ migrate = Migrate()
 
 def init_db(app):
     env = os.getenv("APP_ENV", "development").lower()
-    db_uri = os.getenv("NEON_DB_URI")
+    if env == "production":
+        db_uri = os.getenv("DB_PROD_URI")
+    else:
+        db_uri = os.getenv("DB_DEV_URI")
 
     if not db_uri:
         raise RuntimeError("❌ Environment variable NEON_DB_URI is not set.")
