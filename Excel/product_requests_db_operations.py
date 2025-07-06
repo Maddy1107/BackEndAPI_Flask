@@ -64,6 +64,6 @@ def mark_product_request_received(req_id):
         return None
 
     req.received = True
-    req.received_at = datetime.date.today
+    req.received_at = datetime.date.today()
     db.session.commit()
     return req
