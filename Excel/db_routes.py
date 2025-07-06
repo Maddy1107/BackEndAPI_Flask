@@ -1,13 +1,14 @@
 from flask import request, jsonify
 
-from Excel.closing_stock_db_operations import (
+from closing_stock_db_operations import (
     insert_monthly_product_data,
     get_product_data_by_month,
 )
-from Excel.product_requests_db_operations import (
+from product_requests_db_operations import (
     create_product_requests,
     get_all_product_requests,
     mark_product_request_received,
+    mark_product_request_not_received,
 )
 
 
@@ -57,6 +58,13 @@ def register_product_routes(app):
     @app.route("/mark-received/<int:req_id>", methods=["POST"])
     def mark_received(req_id):
         updated_request = mark_product_request_received(req_id)
+        if not updated_request:
+            return jsonify({"error": "Request not found"}), 404
+        return jsonify({"message": "Marked as received", "id": updated_request.id})
+
+    @app.route("/mark-not-received/<int:req_id>", methods=["POST"])
+    def mark_not_received(req_id):
+        updated_request = mark_product_request_not_received(req_id)
         if not updated_request:
             return jsonify({"error": "Request not found"}), 404
         return jsonify({"message": "Marked as received", "id": updated_request.id})

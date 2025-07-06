@@ -23,7 +23,7 @@ def create_product_requests(product_list):
             # 🔄 Overwrite logic: reset 'received' to False and clear 'received_at'
             existing.received = False
             existing.received_at = None
-            existing.requested_at = datetime.date.today
+            existing.requested_at = datetime.date.today()
         else:
             # ➕ Add new
             req = ProductRequest(product_name=name)
@@ -65,5 +65,16 @@ def mark_product_request_received(req_id):
 
     req.received = True
     req.received_at = datetime.date.today()
+    db.session.commit()
+    return req
+
+
+def mark_product_request_not_received(req_id):
+    req = ProductRequest.query.get(req_id)
+    if not req:
+        return None
+
+    req.received = False
+    req.received_at = None
     db.session.commit()
     return req
