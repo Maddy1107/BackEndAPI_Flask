@@ -16,14 +16,14 @@ def create_product_requests(product_list):
         # 🧠 Check if a request for this product exists for today
         existing = ProductRequest.query.filter(
             ProductRequest.product_name == name,
-            db.func.date(ProductRequest.requested_at) == today
+            db.func.date(ProductRequest.requested_at) == today,
         ).first()
 
         if existing:
             # 🔄 Overwrite logic: reset 'received' to False and clear 'received_at'
             existing.received = False
             existing.received_at = None
-            existing.requested_at = datetime.date
+            existing.requested_at = datetime.date.today
         else:
             # ➕ Add new
             req = ProductRequest(product_name=name)
@@ -64,6 +64,6 @@ def mark_product_request_received(req_id):
         return None
 
     req.received = True
-    req.received_at = datetime.date
+    req.received_at = datetime.date.today
     db.session.commit()
     return req
