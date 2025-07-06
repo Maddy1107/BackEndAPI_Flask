@@ -18,6 +18,6 @@ class ProductRequest(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(100), nullable=False)
-    requested_at = db.Column(db.Date, default=datetime.date)
+    requested_at = db.Column(db.Date, default=datetime.date.today)
     received = db.Column(db.Boolean, default=False)
     received_at = db.Column(db.Date, nullable=True)
