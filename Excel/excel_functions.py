@@ -25,7 +25,7 @@ def extract_product_quantity(file_path):
         return {}, str(e)
 
 
-def update_excel_file(file, update_dict, sheet_name=None):
+def update_excel_file(file, update_dict, name, sheet_name=None):
     try:
         wb = load_workbook(file)
         sheet = wb[sheet_name] if sheet_name else wb.active
@@ -49,7 +49,7 @@ def update_excel_file(file, update_dict, sheet_name=None):
                         f"Invalid format for '{product_name}'. Expected a list of at least 2 values.",
                     )
 
-        update_named_cells(sheet)
+        update_named_cells(sheet, name)
 
         output_stream = BytesIO()
         wb.save(output_stream)
@@ -61,8 +61,13 @@ def update_excel_file(file, update_dict, sheet_name=None):
 
 
 def get_month_column(sheet):
-    current_month = datetime.datetime.now().strftime("%B").lower()  # "june"
-    header_row = sheet[4]
+    current_month = datetime.datetime.now().strftime("%B").lower()  # e.g., "july"
+    try:
+        header_row = list(sheet.iter_rows(min_row=4, max_row=4))[
+            0
+        ]  # 5th row is index 4
+    except IndexError:
+        return -1  # Row doesn't exist
 
     for col_index, cell in enumerate(header_row):
         cell_value = str(cell.value).strip().lower() if cell.value else ""
@@ -72,18 +77,26 @@ def get_month_column(sheet):
     return -1  # Not found
 
 
-def update_named_cells(sheet):
-    for row in sheet.iter_rows():
+def update_named_cells(sheet, name):
+    month_col = get_month_column(sheet)
+    if month_col == -1:
+        print("Current month column not found.")
+        return
+
+    # Loop through top 4 rows (0-based index 1 to 4)
+    for row_idx in range(1, 5):
+        row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx))[0]
+
         for i, cell in enumerate(row):
             if not cell.value:
                 continue
 
             cell_value = str(cell.value).strip().lower()
 
-            # Match "Name"
-            if "name" in cell_value:
-                row[i + 1].value = "Priyanka Roy"
+            # Update "name" anywhere
+            if "name" in cell_value and i == month_col:
+                row[i + 1].value = name
 
-            # Match "Handover Date:"
-            elif "handover" in cell_value:
+            # Only update "handover" if it's the cell above the month_col
+            elif "handover" in cell_value and i == month_col:
                 row[i + 1].value = datetime.datetime.now().strftime("%d-%m-%Y")

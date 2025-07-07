@@ -29,8 +29,8 @@ def register_excel_routes(app):
             if os.path.exists(file_path):
                 os.remove(file_path)
 
-    @app.route("/export", methods=["POST"])
-    def export_file():
+    @app.route("/export/<name>", methods=["POST"])
+    def export_file(name):
         file = request.files.get("file")
         filename = request.form.get("filename")
         json_data = request.form.get("data")
@@ -47,7 +47,7 @@ def register_excel_routes(app):
         except Exception as e:
             return jsonify({"error": "Invalid JSON format", "message": str(e)}), 400
 
-        output_stream, error = update_excel_file(file, update_dict)
+        output_stream, error = update_excel_file(file, update_dict, name)
         if error:
             return (
                 jsonify({"error": "Failed to update Excel file", "message": error}),
@@ -61,8 +61,8 @@ def register_excel_routes(app):
             download_name=filename,
         )
 
-    @app.route("/export-sheet", methods=["POST"])
-    def export_specific_sheet():
+    @app.route("/export-sheet/<name>", methods=["POST"])
+    def export_specific_sheet(name):
         file = request.files.get("file")
         filename = request.form.get("filename")
         json_data = request.form.get("data")
@@ -82,7 +82,7 @@ def register_excel_routes(app):
         except Exception as e:
             return jsonify({"error": "Invalid JSON format", "message": str(e)}), 400
 
-        output_stream, error = update_excel_file(file, update_dict, sheet_name)
+        output_stream, error = update_excel_file(file, update_dict, name, sheet_name)
         if error:
             return (
                 jsonify({"error": "Failed to update Excel file", "message": error}),
