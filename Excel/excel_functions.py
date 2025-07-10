@@ -79,24 +79,21 @@ def get_month_column(sheet):
 
 def update_named_cells(sheet, name):
     month_col = get_month_column(sheet)
-    if month_col == -1:
-        print("Current month column not found.")
-        return
 
-    # Loop through top 4 rows (0-based index 1 to 4)
-    for row_idx in range(1, 5):
+    for row_idx in range(1, 5):  # Rows 1 to 4 (1-based)
         row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx))[0]
 
         for i, cell in enumerate(row):
             if not cell.value:
                 continue
 
-            cell_value = str(cell.value).strip().lower()
+            val = str(cell.value).strip().lower()
 
-            # Update "name" anywhere
-            if "name" in cell_value and i == month_col:
-                row[i + 1].value = name
-
-            # Only update "handover" if it's the cell above the month_col
-            elif "handover" in cell_value and i == month_col:
-                row[i + 1].value = datetime.datetime.now().strftime("%d-%m-%Y")
+            if "name" in val or "handover" in val:
+                should_update = (month_col == -1) or (i == month_col)
+                if should_update and i + 1 < len(row):
+                    row[i + 1].value = (
+                        name
+                        if "name" in val
+                        else datetime.datetime.now().strftime("%d-%m-%Y")
+                    )
