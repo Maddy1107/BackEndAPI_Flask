@@ -13,6 +13,7 @@ from product_requests_db_operations import (
 
 
 def register_product_routes(app):
+
     @app.route("/month-data", methods=["POST"])
     def upload_month_data():
         month = request.args.get("month")
