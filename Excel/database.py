@@ -13,20 +13,16 @@ migrate = Migrate()
 
 
 def init_db(app):
-    env = os.getenv("APP_ENV", "development").lower()
     if ConfigState.current_env == "production":
         db_uri = os.getenv("DB_PROD_URI")
     else:
         db_uri = os.getenv("DB_DEV_URI")
 
-    print(f"Using {env} database URI: {db_uri}")
-    print(f"Initializing database for {env} environment...")
     if not db_uri:
         raise RuntimeError("❌ Environment variable NEON_DB_URI is not set.")
 
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["DEBUG"] = env != "production"
 
     db.init_app(app)
     migrate.init_app(app, db)
