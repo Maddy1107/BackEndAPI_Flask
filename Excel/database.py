@@ -3,6 +3,8 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 
+from config_state import ConfigState
+
 # Load variables from .env
 load_dotenv()
 
@@ -12,11 +14,13 @@ migrate = Migrate()
 
 def init_db(app):
     env = os.getenv("APP_ENV", "development").lower()
-    if env == "production":
+    if ConfigState.current_env == "production":
         db_uri = os.getenv("DB_PROD_URI")
     else:
         db_uri = os.getenv("DB_DEV_URI")
 
+    print(f"Using {env} database URI: {db_uri}")
+    print(f"Initializing database for {env} environment...")
     if not db_uri:
         raise RuntimeError("❌ Environment variable NEON_DB_URI is not set.")
 

@@ -15,8 +15,9 @@ register_product_routes(app)
 @app.route("/set_env", methods=["POST"])
 def set_env():
     data = request.get_json()
-    env = data.get("env", "development").lower()
+    env = data["build_type"].lower() if "build_type" in data else "development"
 
+    print(f"Setting environment to: {env}")
     if env not in ["development", "production"]:
         return jsonify({"error": "Invalid environment"}), 400
 
