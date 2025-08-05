@@ -1,40 +1,43 @@
 from flask import Flask, jsonify, request
 from config_state import ConfigState
-from database import init_db
+from database import preload_db, reconfigure_db, db
 
-from db_routes import register_product_routes
-from excel_routes import register_excel_routes
-
+# ✅ Create and preload the app + DB with dummy connection
 app = Flask(__name__)
-
-init_db(app)
-register_excel_routes(app)
-register_product_routes(app)
+preload_db(app)  # This makes sure `db.Model` is always bound
 
 
+# Register routes early
 @app.route("/set_env", methods=["POST"])
 def set_env():
     data = request.get_json()
-    env = data["build_type"].lower() if "build_type" in data else "development"
+    env = data.get("build_type", "development").lower()
 
-    print(f"Setting environment to: {env}")
     if env not in ["development", "production"]:
-        return jsonify({"error": "Invalid environment"}), 400
+        return jsonify({"error": "Invalid env"}), 400
 
     ConfigState.current_env = env
+    ConfigState.db_initialized = True
 
-    return jsonify({"message": f"Environment set to {env}"}), 200
+    try:
+        reconfigure_db(app)
+        return jsonify({"message": f"Env set to {env}"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/warmup", methods=["GET"])
 def warmup():
+    if not ConfigState.db_initialized:
+        return jsonify({"error": "Env not set. Call /set_env first."}), 500
+
     try:
         from models import MonthlyProductData
 
-        _ = MonthlyProductData.query.first()
-        return jsonify({"message": "Server is ready"}), 200
+        item = MonthlyProductData.query.first()
+        return jsonify({"ok": True, "product": item.to_dict() if item else None}), 200
     except Exception as e:
-        return jsonify({"error": str(e), "tip": "Try calling /set_env first"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

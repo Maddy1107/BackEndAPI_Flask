@@ -1,5 +1,6 @@
 from flask import request, jsonify
 
+from config_state import ConfigState
 from closing_stock_db_operations import (
     insert_monthly_product_data,
     get_product_data_by_month,
@@ -16,6 +17,13 @@ def register_product_routes(app):
 
     @app.route("/month-data", methods=["POST"])
     def upload_month_data():
+
+        if not ConfigState.db_initialized:
+            return (
+                jsonify({"error": "Database not initialized. Call /set_env first."}),
+                500,
+            )
+
         month = request.args.get("month")
         year = request.args.get("year")
         data = request.get_json()

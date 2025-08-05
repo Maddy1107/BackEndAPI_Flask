@@ -1,3 +1,3 @@
-# config_state.py
 class ConfigState:
-    current_env = "development"  # default
+    current_env = None
+    db_initialized = False
