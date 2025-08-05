@@ -26,5 +26,3 @@ def init_db(app):
 
     db.init_app(app)
     migrate.init_app(app, db)
-
-    print(f"DB connected [{env}]")
