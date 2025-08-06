@@ -1,5 +1,5 @@
-import datetime
 from database import db
+import datetime
 
 
 class MonthlyProductData(db.Model):
@@ -11,6 +11,16 @@ class MonthlyProductData(db.Model):
     product_name = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.String(50), nullable=False)
     bottles = db.Column(db.String(50), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "month": self.month,
+            "year": self.year,
+            "product_name": self.product_name,
+            "quantity": self.quantity,
+            "bottles": self.bottles,
+        }
 
 
 class ProductRequest(db.Model):

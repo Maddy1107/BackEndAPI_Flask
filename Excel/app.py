@@ -1,41 +1,47 @@
-from flask import Flask, jsonify, request
-from config_state import ConfigState
-from database import preload_db, reconfigure_db, db
+from flask import request, jsonify
+from app_factory import create_app
 
-# ✅ Create and preload the app + DB with dummy connection
-app = Flask(__name__)
-preload_db(app)  # This makes sure `db.Model` is always bound
+from db_routes import register_product_routes
+from excel_routes import register_excel_routes
+
+# ✅ Start with dummy dev app
+app = create_app(env="development")
+
+# ✅ Register routes
+register_product_routes(app)
+register_excel_routes(app)
 
 
-# Register routes early
 @app.route("/set_env", methods=["POST"])
 def set_env():
+    global app
     data = request.get_json()
     env = data.get("build_type", "development").lower()
 
     if env not in ["development", "production"]:
         return jsonify({"error": "Invalid env"}), 400
 
-    ConfigState.current_env = env
-    ConfigState.db_initialized = True
-
     try:
-        reconfigure_db(app)
-        return jsonify({"message": f"Env set to {env}"}), 200
+        # ✅ Rebuild app with new env
+        app = create_app(env=env)
+        return jsonify({"message": f"Environment set to {env}"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/warmup", methods=["GET"])
-def warmup():
-    if not ConfigState.db_initialized:
-        return jsonify({"error": "Env not set. Call /set_env first."}), 500
+@app.route("/debug/db", methods=["GET"])
+def debug_db():
+    return jsonify({"uri": app.config["SQLALCHEMY_DATABASE_URI"]})
 
+
+@app.route("/warmup")
+def warmup():
     try:
         from models import MonthlyProductData
 
-        item = MonthlyProductData.query.first()
-        return jsonify({"ok": True, "product": item.to_dict() if item else None}), 200
+        with app.app_context():
+            item = MonthlyProductData.query.first()
+            return jsonify({"ok": True, "data": item.to_dict() if item else None}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
